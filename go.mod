@@ -1,1 +1,1 @@
-module xkcd-pics-search
+module xkcd-comics-search

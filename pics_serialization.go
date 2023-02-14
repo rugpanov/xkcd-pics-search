@@ -5,19 +5,19 @@ import (
 	"os"
 )
 
-func (pics *Pics) SaveTo(fileName string) {
-	bytes, err := json.Marshal(pics)
-	HandleError(err, "Cannot serialize pics ")
+func (comicsRef *Comics) SaveTo(fileName string) {
+	bytes, err := json.Marshal(comicsRef)
+	HandleError(err, "Cannot serialize comicsRef ")
 
 	err = os.WriteFile(fileName, bytes, 0644)
 	HandleError(err, "Cannot open file "+fileName+": ")
 }
 
-func Read(fileName string) (pics Pics) {
+func Read(fileName string) (comics Comics) {
 	reader, err := os.Open(fileName)
 	HandleError(err, "Cannot open file "+fileName+": ")
 
-	err = json.NewDecoder(reader).Decode(&pics)
-	HandleError(err, "Cannot decode pics from file "+fileName+": ")
+	err = json.NewDecoder(reader).Decode(&comics)
+	HandleError(err, "Cannot decode comics from file "+fileName+": ")
 	return
 }

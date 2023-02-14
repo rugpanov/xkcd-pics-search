@@ -7,25 +7,25 @@ import (
 	"strconv"
 )
 
-func FetchComics(urlBase string, urlPostfix string) *Pics {
-	var pics Pics
+func FetchComics(urlBase string, urlPostfix string) *Comics {
+	var comics Comics
 	for i := 1; ; i++ {
 		if i%25 == 0 {
-			fmt.Printf("Fetching image #%s\n", strconv.Itoa(i))
+			fmt.Printf("Fetching comics #%s\n", strconv.Itoa(i))
 		}
 
 		var url = urlBase + strconv.Itoa(i) + urlPostfix
-		cur, shouldContinue := readPicDescription(url)
+		cur, shouldContinue := readComic(url)
 		if !shouldContinue {
 			break
 		}
-		pics = append(pics, cur)
+		comics = append(comics, cur)
 	}
 
-	return &pics
+	return &comics
 }
 
-func readPicDescription(url string) (pics *Comics, shouldContinue bool) {
+func readComic(url string) (comic *Comic, shouldContinue bool) {
 	body, err := http.Get(url)
 	HandleError(err, "Cannot read url: "+url)
 	defer body.Body.Close()
@@ -34,8 +34,8 @@ func readPicDescription(url string) (pics *Comics, shouldContinue bool) {
 		return nil, false
 	}
 
-	pics = &Comics{}
-	err = json.NewDecoder(body.Body).Decode(pics)
+	comic = &Comic{}
+	err = json.NewDecoder(body.Body).Decode(comic)
 	HandleError(err, "Cannot decode: ")
-	return pics, true
+	return comic, true
 }

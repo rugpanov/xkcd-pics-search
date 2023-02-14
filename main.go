@@ -9,41 +9,41 @@ import (
 )
 
 func main() {
-	var fileName = "./pics.json"
+	var fileName = "./xkcd.json"
 	const urlBase = "https://xkcd.com/"
 	const urlPostfix = "/info.0.json"
 
 	if !IsFileExist(fileName) {
-		pics := FetchComics(urlBase, urlPostfix)
-		pics.SaveTo(fileName)
+		comics := FetchComics(urlBase, urlPostfix)
+		comics.SaveTo(fileName)
 	}
 
 	var cache = *initAndBuildCache(fileName)
 	chatWithUser(cache)
 }
 
-func chatWithUser(cache map[string]Pics) {
+func chatWithUser(cache map[string]Comics) {
 	for {
 		var keywords = *requestKeywords()
-		var foundPicsSet = searchForPics(cache, keywords)
-		for index, pic := range foundPicsSet {
-			fmt.Printf("[%d] %s %s %s\n", index, pic.Title, pic.Day+"/"+pic.Month+"/"+pic.Year, pic.Img)
+		var foundComics = searchForComics(cache, keywords)
+		for index, comic := range foundComics {
+			fmt.Printf("[%d] %s %s %s\n", index, comic.Title, comic.Day+"/"+comic.Month+"/"+comic.Year, comic.Img)
 		}
 	}
 }
 
-func searchForPics(cache map[string]Pics, keywords []string) Pics {
-	var foundPicsSet = make(map[*Comics]struct{})
+func searchForComics(cache map[string]Comics, keywords []string) Comics {
+	var foundComics = make(map[*Comic]struct{})
 	for _, kword := range keywords {
-		var foundPics = cache[strings.ToLower(kword)]
-		for _, title := range foundPics {
-			foundPicsSet[title] = struct{}{}
+		var foundComicsCache = cache[strings.ToLower(kword)]
+		for _, title := range foundComicsCache {
+			foundComics[title] = struct{}{}
 		}
 	}
 
-	var result Pics
-	for pic := range foundPicsSet {
-		result = append(result, pic)
+	var result Comics
+	for comic := range foundComics {
+		result = append(result, comic)
 	}
 
 	return result
@@ -65,18 +65,18 @@ func requestKeywords() *[]string {
 	return &kwords
 }
 
-func initAndBuildCache(fileName string) *map[string]Pics {
+func initAndBuildCache(fileName string) *map[string]Comics {
 	fmt.Printf("Start reading file %s\n", fileName)
-	pics := Read(fileName)
+	comics := Read(fileName)
 	fmt.Printf("Finish reading file %s\n", fileName)
 
 	fmt.Printf("Start preparing cache\n")
-	var cache = make(map[string]Pics)
-	for _, pic := range pics {
+	var cache = make(map[string]Comics)
+	for _, comic := range comics {
 		var compiled = regexp.MustCompile("[^a-zA-Z0-9-_]")
-		var splited = compiled.Split(pic.Transcript, -1)
+		var splited = compiled.Split(comic.Transcript, -1)
 		for _, token := range splited {
-			cache[strings.ToLower(token)] = append(cache[token], pic)
+			cache[strings.ToLower(token)] = append(cache[token], comic)
 		}
 	}
 	fmt.Printf("Finish preparing cache\n")

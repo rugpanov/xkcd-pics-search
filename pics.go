@@ -2,9 +2,9 @@ package main
 
 import "encoding/json"
 
-type Pics []*Comics
+type Comics []*Comic
 
-type Comics struct {
+type Comic struct {
 	Title      string `json:"title"`
 	Day        string `json:"day"`
 	Month      string `json:"month"`
@@ -13,7 +13,7 @@ type Comics struct {
 	Transcript string `json:"transcript"`
 }
 
-func (pd Comics) String() string {
+func (pd Comic) String() string {
 	marshal, err := json.Marshal(pd)
 	HandleError(err, "Cannot marshal json: ")
 	return string(marshal)

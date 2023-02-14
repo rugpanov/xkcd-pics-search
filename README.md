@@ -1,7 +1,7 @@
-# XKCD Pics Search
+# XKCD Comics Search
 
 This is a Go program that allows users to search for *XKCD* comics based on keywords from their transcripts. If the
-pics.json file doesn't exist, it will be fetched from the *XKCD* API and saved to disk.
+`xkcd.json` file doesn't exist, it will be fetched from the *XKCD* API and saved to disk.
 
 ## Usage
 
