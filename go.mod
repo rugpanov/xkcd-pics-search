@@ -1,0 +1,1 @@
+module xkcd-pics-search
