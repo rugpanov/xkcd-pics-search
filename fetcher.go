@@ -7,6 +7,10 @@ import (
 	"strconv"
 )
 
+const ErrorThreshold = 5
+
+var errorsLeft = ErrorThreshold
+
 func FetchComics(urlBase string, urlPostfix string) *Comics {
 	var comics Comics
 	for i := 1; ; i++ {
@@ -16,10 +20,14 @@ func FetchComics(urlBase string, urlPostfix string) *Comics {
 
 		var url = urlBase + strconv.Itoa(i) + urlPostfix
 		cur, shouldContinue := readComic(url)
-		if !shouldContinue {
+		if !shouldContinue && errorsLeft >= 0 {
+			errorsLeft--
+		} else if !shouldContinue {
 			break
+		} else {
+			comics = append(comics, cur)
+			errorsLeft = ErrorThreshold
 		}
-		comics = append(comics, cur)
 	}
 
 	return &comics
