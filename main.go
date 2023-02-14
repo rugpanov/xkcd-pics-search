@@ -26,24 +26,31 @@ func chatWithUser(cache map[string]Comics) {
 	for {
 		var keywords = *requestKeywords()
 		var foundComics = searchForComics(cache, keywords)
-		for index, comic := range foundComics {
-			fmt.Printf("[%d] %s %s %s\n", index, comic.Title, comic.Day+"/"+comic.Month+"/"+comic.Year, comic.Img)
+		for _, comic := range foundComics {
+			fmt.Printf("%s %s/%s/%s %q\n", comic.Img, comic.Day, comic.Month, comic.Year, comic.Title)
 		}
+		fmt.Printf("found %d comics\n", len(foundComics))
 	}
 }
 
 func searchForComics(cache map[string]Comics, keywords []string) Comics {
-	var foundComics = make(map[*Comic]struct{})
-	for _, kword := range keywords {
-		var foundComicsCache = cache[strings.ToLower(kword)]
-		for _, title := range foundComicsCache {
-			foundComics[title] = struct{}{}
-		}
-	}
-
 	var result Comics
-	for comic := range foundComics {
-		result = append(result, comic)
+
+	var firstKword = keywords[0]
+	for _, comic := range cache[firstKword] {
+		var transcript = strings.ToLower(comic.Transcript)
+		var title = strings.ToLower(comic.Title)
+
+		var hasAll = true
+		for _, kword := range keywords {
+			if !strings.Contains(transcript, kword) && !strings.Contains(title, kword) {
+				hasAll = false
+				break
+			}
+		}
+		if hasAll {
+			result = append(result, comic)
+		}
 	}
 
 	return result
