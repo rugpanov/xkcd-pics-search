@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func FetchPics(urlBase string, urlPostfix string) *Pics {
+func FetchComics(urlBase string, urlPostfix string) *Pics {
 	var pics Pics
 	for i := 1; ; i++ {
 		if i%25 == 0 {
@@ -25,7 +25,7 @@ func FetchPics(urlBase string, urlPostfix string) *Pics {
 	return &pics
 }
 
-func readPicDescription(url string) (pics *PicDescription, shouldContinue bool) {
+func readPicDescription(url string) (pics *Comics, shouldContinue bool) {
 	body, err := http.Get(url)
 	HandleError(err, "Cannot read url: "+url)
 	defer body.Body.Close()
@@ -34,7 +34,7 @@ func readPicDescription(url string) (pics *PicDescription, shouldContinue bool) 
 		return nil, false
 	}
 
-	pics = &PicDescription{}
+	pics = &Comics{}
 	err = json.NewDecoder(body.Body).Decode(pics)
 	HandleError(err, "Cannot decode: ")
 	return pics, true

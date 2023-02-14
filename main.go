@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"regexp"
@@ -13,7 +14,7 @@ func main() {
 	const urlPostfix = "/info.0.json"
 
 	if !IsFileExist(fileName) {
-		pics := FetchPics(urlBase, urlPostfix)
+		pics := FetchComics(urlBase, urlPostfix)
 		pics.SaveTo(fileName)
 	}
 
@@ -32,7 +33,7 @@ func chatWithUser(cache map[string]Pics) {
 }
 
 func searchForPics(cache map[string]Pics, keywords []string) Pics {
-	var foundPicsSet = make(map[*PicDescription]struct{})
+	var foundPicsSet = make(map[*Comics]struct{})
 	for _, kword := range keywords {
 		var foundPics = cache[strings.ToLower(kword)]
 		for _, title := range foundPics {
@@ -52,7 +53,10 @@ func requestKeywords() *[]string {
 	fmt.Printf("Provide whitespace separated keywords. Type `exit` to leave:\n")
 	var keywords string
 
-	fmt.Scanln(&keywords)
+	reader := bufio.NewReader(os.Stdin)
+	line, _, err := reader.ReadLine()
+	HandleError(err, "reader doesn't work: ")
+	keywords = string(line)
 	kwords := strings.Fields(strings.TrimSpace(keywords))
 	if keywords == "exit" {
 		fmt.Println("Goodbye!")
