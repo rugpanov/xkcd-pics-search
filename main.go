@@ -22,7 +22,7 @@ func main() {
 	chatWithUser(cache)
 }
 
-func chatWithUser(cache map[string]Comics) {
+func chatWithUser(cache map[string]ComicSet) {
 	for {
 		var keywords = *requestKeywords()
 		var foundComics = searchForComics(cache, keywords)
@@ -33,11 +33,14 @@ func chatWithUser(cache map[string]Comics) {
 	}
 }
 
-func searchForComics(cache map[string]Comics, keywords []string) Comics {
+type ComicSet map[Comic]struct{}
+
+func searchForComics(cache map[string]ComicSet, keywords []string) Comics {
 	var result Comics
 
 	var firstKword = keywords[0]
-	for _, comic := range cache[firstKword] {
+	var comicSet = cache[firstKword]
+	for comic := range comicSet {
 		var transcript = strings.ToLower(comic.Transcript)
 		var title = strings.ToLower(comic.Title)
 
@@ -49,7 +52,8 @@ func searchForComics(cache map[string]Comics, keywords []string) Comics {
 			}
 		}
 		if hasAll {
-			result = append(result, comic)
+			var copyComic = comic
+			result = append(result, &copyComic)
 		}
 	}
 
@@ -72,21 +76,25 @@ func requestKeywords() *[]string {
 	return &kwords
 }
 
-func initAndBuildCache(fileName string) *map[string]Comics {
+func initAndBuildCache(fileName string) *map[string]ComicSet {
 	fmt.Printf("Start reading file %s\n", fileName)
 	comics := Read(fileName)
-	fmt.Printf("Finish reading file %s\n", fileName)
+	fmt.Printf("Finish reading file %s. Read %d comics\n", fileName, len(comics))
 
 	fmt.Printf("Start preparing cache\n")
-	var cache = make(map[string]Comics)
+	var cache = make(map[string]ComicSet)
 	for _, comic := range comics {
 		var compiled = regexp.MustCompile("[^a-zA-Z0-9-_]")
 		var splited = compiled.Split(comic.Transcript, -1)
 		for _, token := range splited {
-			cache[strings.ToLower(token)] = append(cache[token], comic)
+			if cache[strings.ToLower(token)] == nil {
+				cache[strings.ToLower(token)] = make(map[Comic]struct{})
+			}
+			var tokenCache = cache[strings.ToLower(token)]
+			tokenCache[*comic] = struct{}{}
 		}
 	}
-	fmt.Printf("Finish preparing cache\n")
+	fmt.Printf("Finish preparing cache. Cache size: %d\n", len(cache))
 
 	return &cache
 }
